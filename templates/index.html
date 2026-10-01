@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptic Care - Telemedicine Security</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background: #f0f4f8; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+        .hero { 
+            background: linear-gradient(135deg, #0d6efd, #0dcaf0); 
+            color: white; 
+            padding: 30px 0; 
+            margin-bottom: 30px; 
+            text-align: center; 
+            border-radius: 0 0 25px 25px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+        }
+        .card { 
+            border-radius: 15px; 
+            border: none; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06); 
+            transition: 0.3s; 
+        }
+        .card:hover { 
+            transform: translateY(-3px); 
+        }
+        .nav-tabs .nav-link.active { 
+            font-weight: bold; 
+            color: #0d6efd; 
+            border-bottom: 3px solid #0d6efd; 
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1 class="fw-bold">🏥 Cryptic Care</h1>
+        <p class="lead mb-0">Telemedicine Security System using LSB & DCT Steganography with AES Encryption</p>
+    </div>
+
+    <div class="container mb-5">
+        <ul class="nav nav-tabs justify-content-center mb-4" id="stegoTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fs-5" id="encode-tab" data-bs-toggle="tab" data-bs-target="#encode-pane" type="button">🔒 Embed Patient Data</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fs-5" id="decode-tab" data-bs-toggle="tab" data-bs-target="#decode-pane" type="button">🔓 Extract & Decrypt Data</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="stegoTabContent">
+            <!-- ENCODE SECTION -->
+            <div class="tab-pane fade show active" id="encode-pane">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card p-4">
+                            <h4 class="mb-3 text-primary">Embed Confidential Patient Data into Medical Image</h4>
+                            <form action="/encode" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">1. Select Medical Image (Cover Image):</label>
+                                    <input type="file" name="cover_image" class="form-control" accept="image/*" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">2. Secret Encryption Key (AES Key):</label>
+                                    <input type="text" name="secret_key" class="form-control" placeholder="e.g. MySecretPass@123" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">3. Confidential Patient Data:</label>
+                                    <textarea name="patient_data" class="form-control" rows="4" placeholder="Enter Patient Name, ID, Diagnosis, Treatment, etc..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-2 fs-5">🔒 Encrypt & Hide Data</button>
+                            </form>
+
+                            {% if encode_success %}
+                            <div class="alert alert-success mt-4">
+                                <h5 class="alert-heading">✅ Data Embedded Successfully!</h5>
+                                <p class="mb-2">Stego Image is generated. The patient details are encrypted with AES and hidden inside the image pixels.</p>
+                                <a href="{{ stego_url }}" download class="btn btn-success">📥 Download Stego Image</a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DECODE SECTION -->
+            <div class="tab-pane fade" id="decode-pane">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card p-4">
+                            <h4 class="mb-3 text-success">Extract & Decrypt Patient Data</h4>
+                            <form action="/decode" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">1. Upload Stego Image:</label>
+                                    <input type="file" name="stego_image" class="form-control" accept="image/*" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">2. Enter Secret Encryption Key (AES Key):</label>
+                                    <input type="text" name="secret_key" class="form-control" placeholder="Enter the exact key used during embedding" required>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100 py-2 fs-5">🔓 Extract & Decrypt</button>
+                            </form>
+
+                            {% if decoded_data %}
+                            <div class="alert alert-info mt-4">
+                                <h5 class="alert-heading">📄 Extracted Patient Information:</h5>
+                                <div class="bg-white p-3 border rounded text-dark mt-2" style="white-space: pre-wrap; font-family: monospace;">{{ decoded_data }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% if active_tab == 'decode' %}
+    <script>
+        var tabTrigger = new bootstrap.Tab(document.querySelector('#decode-tab'));
+        tabTrigger.show();
+    </script>
+    {% endif %}
+</body>
+</html>
